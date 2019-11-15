@@ -5,6 +5,8 @@ import MovieCard from './MovieCard'
 
 const Movie = (props) => {
 
+  console.log('Movie Props', props)
+
   const [movie, setMovie] = useState();
 
   useEffect(() => {
@@ -19,6 +21,7 @@ const Movie = (props) => {
         .catch(error => {
           console.error(error);
         });
+
   },[props.match.params.id]);
 
   const saveMovie = () => {
@@ -30,10 +33,9 @@ const Movie = (props) => {
     return <div>Loading movie information...</div>;
   }
 
-  const { title, director, metascore, stars } = movie;
   return (
     <div className="save-wrapper">
-        <MovieCard  title={title} director={director} metascore={metascore} stars={stars} />
+        <MovieCard  movie={movie} />
       <div onClick={() => saveMovie()} className="save-button">Save</div>
     </div>
   );
