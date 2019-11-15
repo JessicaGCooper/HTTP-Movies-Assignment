@@ -29,6 +29,27 @@ const Movie = (props) => {
     addToSavedList(movie)
   }
 
+  // useEffect(())
+
+  const deleteMovie = () => {
+    axios
+      .delete(`http://localhost:5000/api/movies/${movie.id}`)
+      .then(res => {
+        // you may need to build the array of items here
+        // if the API doesn't return the full array
+        // your new items list would then be passed into
+        // props.updateItems
+        // (refer to todolist logic)
+        console.log(res)
+        const newMovieList = props.movies.filter(el => {
+          return el.id !== res.data
+        })
+        props.updateMovies(newMovieList);
+        props.history.push('/movie-list');
+      })
+      .catch(err => console.log(err));
+  };
+
   if (!movie) {
     return <div>Loading movie information...</div>;
   }
@@ -36,7 +57,17 @@ const Movie = (props) => {
   return (
     <div className="save-wrapper">
         <MovieCard  movie={movie} />
-      <div onClick={() => saveMovie()} className="save-button">Save</div>
+        <div onClick={() => saveMovie()} className="save-button">Save</div>
+      <div className="button-wrapper" >
+        <button
+        className="md-button"
+        onClick={() => props.history.push(`/update-movie/${movie.id}`)} >
+          Edit
+        </button>
+        <button className="md-button" onClick={() => deleteMovie()}>
+          Delete
+        </button>
+      </div>
     </div>
   );
 }
