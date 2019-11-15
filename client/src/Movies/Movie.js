@@ -1,48 +1,42 @@
-import React from "react";
-import axios from "axios";
-import MovieCard from "./MovieCard";
-export default class Movie extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      movie: null
-    };
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+import MovieCard from './MovieCard'
+
+const Movie = (props) => {
+
+  const [movie, setMovie] = useState();
+
+  useEffect(() => {
+
+    const id = props.match.params.id
+
+       axios
+        .get(`http://localhost:5000/api/movies/${id}`)
+        .then(response => {
+          setMovie(response.data);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+  },[props.match.params.id]);
+
+  const saveMovie = () => {
+    const addToSavedList = props.addToSavedList;
+    addToSavedList(movie)
   }
 
-  componentDidMount() {
-    this.fetchMovie(this.props.match.params.id);
+  if (!movie) {
+    return <div>Loading movie information...</div>;
   }
 
-  componentWillReceiveProps(newProps) {
-    if (this.props.match.params.id !== newProps.match.params.id) {
-      this.fetchMovie(newProps.match.params.id);
-    }
-  }
-
-  fetchMovie = id => {
-    axios
-      .get(`http://localhost:5000/api/movies/${id}`)
-      .then(res => this.setState({ movie: res.data }))
-      .catch(err => console.log(err.response));
-  };
-
-  saveMovie = () => {
-    const addToSavedList = this.props.addToSavedList;
-    addToSavedList(this.state.movie);
-  };
-
-  render() {
-    if (!this.state.movie) {
-      return <div>Loading movie information...</div>;
-    }
-
-    return (
-      <div className="save-wrapper">
-        <MovieCard movie={this.state.movie} />
-        <div className="save-button" onClick={this.saveMovie}>
-          Save
-        </div>
-      </div>
-    );
-  }
+  const { title, director, metascore, stars } = movie;
+  return (
+    <div className="save-wrapper">
+        <MovieCard  title={title} director={director} metascore={metascore} stars={stars} />
+      <div onClick={() => saveMovie()} className="save-button">Save</div>
+    </div>
+  );
 }
+
+export default Movie;
